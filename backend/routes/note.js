@@ -37,7 +37,7 @@ router.post('/addnote', fetchuser,
                 isCompleted: isCompleted || false
             });
 
-            console.log('Saving note with date:', note.date);
+            // console.log('Saving note with date:', note.date);
             const savedNote = await note.save();
             // console.log('Saved note:', savedNote);
             res.json(savedNote);
