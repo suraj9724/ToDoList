@@ -4,7 +4,8 @@ const { Schema } = mongoose;
 const NotesSchema = new Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'user',
+        required: true
     },
     title: {
         type: String,
@@ -16,24 +17,14 @@ const NotesSchema = new Schema({
     },
     date: {
         type: Date,
-        required: true,
-        default: Date.now,
-        get: (date) => date.toISOString()
+        default: Date.now
     },
     isCompleted: {
         type: Boolean,
         default: false
-    },
-}, {
-    timestamps: true,
-    toJSON: {
-        getters: true,
-        virtuals: true
-    },
-    toObject: {
-        getters: true,
-        virtuals: true
     }
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('notes', NotesSchema); 
