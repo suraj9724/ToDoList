@@ -5,13 +5,18 @@ import AddNote from './AddNote'
 import { useNavigate } from 'react-router-dom'
 
 const Notes = () => {
+    // Initialize navigation
     const navigate = useNavigate()
+
+    // Get context and required functions
     const context = useContext(noteContext)
     const { notes, getNotes, editNote } = context
-    // const refClose = useRef(null)
+
+    // State for managing note editing and modal
     const [note, setNote] = useState({ id: "", etitle: "", edescription: "" })
     const [modal, setModal] = useState(null)
 
+    // Effect to check authentication and fetch notes
     useEffect(() => {
         if (localStorage.getItem('token')) {
             getNotes();
@@ -22,6 +27,7 @@ const Notes = () => {
         // eslint-disable-next-line
     }, [])
 
+    // Effect to initialize Bootstrap modal
     useEffect(() => {
         // Initialize modal
         const modalElement = document.getElementById('exampleModal')
@@ -36,6 +42,7 @@ const Notes = () => {
         }
     }, [])
 
+    // Handler for updating note details
     const updateNote = (currentNote) => {
         setNote({
             id: currentNote._id,
@@ -45,7 +52,8 @@ const Notes = () => {
         modal?.show()
     }
 
-    const handlechange = async (e) => {
+    // Handler for form submission
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await editNote(note.id, note.etitle, note.edescription);
@@ -56,15 +64,17 @@ const Notes = () => {
         }
     }
 
+    // Handler for input changes
     const onChange = (e) => {
         setNote({ ...note, [e.target.name]: e.target.value })
     }
 
     return (
         <div className="container-fluid py-4">
+            {/* Add Note Component */}
             <AddNote />
 
-            {/* Modal for editing */}
+            {/* Edit Note Modal */}
             <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -72,21 +82,23 @@ const Notes = () => {
                             <h5 className="modal-title" id="exampleModalLabel">Edit Note</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form onSubmit={handlechange}>
+                        <form onSubmit={handleSubmit}>
                             <div className="modal-body">
+                                {/* Title Input */}
                                 <div className="mb-3">
                                     <label htmlFor="etitle" className="form-label">Title</label>
                                     <input
                                         type="text"
                                         className="form-control"
-                                        name="etitle"
                                         id="etitle"
+                                        name="etitle"
                                         value={note.etitle}
                                         onChange={onChange}
                                         minLength={3}
                                         required
                                     />
                                 </div>
+                                {/* Description Input */}
                                 <div className="mb-3">
                                     <label htmlFor="edescription" className="form-label">Description</label>
                                     <textarea
@@ -101,6 +113,7 @@ const Notes = () => {
                                     ></textarea>
                                 </div>
                             </div>
+                            {/* Modal Footer with Action Buttons */}
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 <button
@@ -116,15 +129,18 @@ const Notes = () => {
                 </div>
             </div>
 
+            {/* Notes Display Section */}
             <div className="container mt-4">
                 <h2 className="text-center mb-4">Your Notes</h2>
                 {notes.length === 0 ? (
+                    // Empty state message
                     <div className="text-center text-muted">
                         <i className="fas fa-notebook fa-3x mb-3"></i>
                         <h5>No notes yet</h5>
                         <p>Add your first note above!</p>
                     </div>
                 ) : (
+                    // Notes Grid
                     <div className="row">
                         {notes
                             .sort((a, b) => new Date(b.date) - new Date(a.date))

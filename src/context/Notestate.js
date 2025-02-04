@@ -2,14 +2,18 @@ import { useState } from "react";
 import NoteContext from "./notecontext";
 
 const Notestate = (props) => {
+    // Backend API URL
     const host = "http://localhost:5000"
+
+    // State to store all notes
     const [notes, setNotes] = useState([]);
 
-    // Utility function to sort notes
+    // Utility function to sort notes by date
     const sortNotesByDate = (notesArray) => {
         return notesArray.sort((a, b) => new Date(b.date) - new Date(a.date));
     };
 
+    // Fetch all notes from the backend
     const getNotes = async () => {
         try {
             const response = await fetch(`${host}/api/note/fetchNotes`, {
@@ -30,6 +34,7 @@ const Notestate = (props) => {
         }
     }
 
+    // Add a new note
     const addNote = async (title, description) => {
         try {
             const currentDate = new Date().toISOString();
@@ -54,6 +59,7 @@ const Notestate = (props) => {
         }
     }
 
+    // Delete a note by ID
     const deleteNote = async (id) => {
         try {
             await fetch(`${host}/api/note/deletenote/${id}`, {
@@ -63,6 +69,7 @@ const Notestate = (props) => {
                     'auth-token': localStorage.getItem('token')
                 }
             });
+            // Remove note from state
             setNotes(notes.filter((note) => note._id !== id));
         }
         catch (error) {
@@ -70,6 +77,7 @@ const Notestate = (props) => {
         }
     }
 
+    // Edit an existing note
     const editNote = async (id, title, description) => {
         try {
             const response = await fetch(`${host}/api/note/updatenote/${id}`, {
@@ -101,6 +109,7 @@ const Notestate = (props) => {
         }
     }
 
+    // Toggle note completion status
     const toggleComplete = async (id) => {
         try {
             const note = notes.find(n => n._id === id);
@@ -132,6 +141,7 @@ const Notestate = (props) => {
         }
     }
 
+    // Provide context values to children components
     return (
         <NoteContext.Provider value={{ notes, editNote, deleteNote, getNotes, addNote, toggleComplete }}>
             {props.children}
