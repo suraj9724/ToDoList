@@ -22,7 +22,7 @@ const AddNote = () => {
                 <div className="col-md-8">
                     <div className="card shadow-sm">
                         <div className="card-body">
-                            <h4 className="card-title mb-4 text-center">Add a New Note</h4>
+                            <h4 className="card-title mb-4 text-center">Add a New Task</h4>
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
                                     <label htmlFor="title" className="form-label">Title</label>
