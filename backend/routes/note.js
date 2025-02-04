@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router()
 var fetchuser = require('../middleware/fetchuser')
-const Note = require('../models/Notes')
+const Note = require('../models/Note')
 const { body, validationResult } = require('express-validator');
-const mongoose = require('mongoose');
 
 router.get('/fetchNotes', fetchuser, async (req, res) => {
     try {
@@ -22,41 +21,67 @@ router.post('/addnote', fetchuser,
     ],
     async (req, res) => {
         try {
-            const { title, description } = req.body;
+            const { title, description, isCompleted, date } = req.body;
+            // console.log('Received date:', date);
+
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
             }
-            const note = await Note.create({
-                title, description, user: req.user.id
-            })
-            const saveNote = await note.save()
-            res.json(saveNote)
-        }
-        catch (error) {
-            console.error(error.message)
-            res.status(500).send("Server Error")
-        }
-    }
-)
-router.patch('/udpatenote/:id', fetchuser,
-    async (req, res) => {
-        const { title, description } = req.body
-        try {
-            const newNote = {}
-            if (title) { newNote.title = title }
-            if (description) { newNote.description = description }
-            let note = await Note.findById(req.params.id)
-            if (!note) { return res.status(404).send("Note not found") }
-            note = await Note.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true });
-            res.json(note);
-        }
-        catch (error) {
-            console.error(error.message)
-            res.status(500).send("Server Error")
+
+            const note = new Note({
+                title,
+                description,
+                user: req.user.id,
+                date: date || new Date(),
+                isCompleted: isCompleted || false
+            });
+
+            console.log('Saving note with date:', note.date);
+            const savedNote = await note.save();
+            // console.log('Saved note:', savedNote);
+            res.json(savedNote);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Internal Server Error");
         }
     }
 )
+router.patch('/updatenote/:id', fetchuser, async (req, res) => {
+    try {
+        const { title, description, isCompleted } = req.body;
+
+        // Find the note first
+        let note = await Note.findById(req.params.id);
+        if (!note) {
+            return res.status(404).json({ error: "Note not found" });
+        }
+
+        // Verify user ownership
+        if (note.user.toString() !== req.user.id) {
+            return res.status(401).json({ error: "Not authorized" });
+        }
+
+        // Build update object
+        const updateFields = {};
+        if (title !== undefined) updateFields.title = title;
+        if (description !== undefined) updateFields.description = description;
+        if (isCompleted !== undefined) updateFields.isCompleted = isCompleted;
+
+        // Update the note
+        const updatedNote = await Note.findByIdAndUpdate(
+            req.params.id,
+            { $set: updateFields },
+            { new: true, runValidators: true }
+        );
+
+        res.json(updatedNote);
+
+    } catch (error) {
+        console.error('Update error:', error);
+        res.status(500).json({ error: "Error updating note" });
+    }
+});
 
 router.delete('/deletenote/:id', fetchuser,
     async (req, res) => {
