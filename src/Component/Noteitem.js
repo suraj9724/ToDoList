@@ -3,16 +3,20 @@ import noteContext from '../context/notecontext'
 import './Noteitem.css'
 
 const Noteitem = (props) => {
+    // Get context and required functions
     const context = useContext(noteContext);
     const { deleteNote, toggleComplete } = context;
     const { note, updateNote } = props;
 
+    // Format date for display
     const formatDate = (dateString) => {
         try {
             const dateToFormat = dateString || note.createdAt;
             if (!dateToFormat) return 'Date not available';
             const date = new Date(dateToFormat);
             if (isNaN(date.getTime())) return 'Date not available';
+
+            // Configure date format options
             const options = {
                 year: 'numeric',
                 month: 'long',
@@ -28,9 +32,12 @@ const Noteitem = (props) => {
     };
 
     return (
+        // Note card container with dynamic styling based on completion status
         <div className='col-md-4 col-lg-3 mb-4'>
             <div className={`card h-100 shadow-sm ${note.isCompleted ? 'bg-light border-success' : 'border-primary'}`}>
+                {/* Card header with completion toggle and action buttons */}
                 <div className="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    {/* Completion checkbox */}
                     <div className="form-check">
                         <input
                             className="form-check-input"
@@ -46,6 +53,7 @@ const Noteitem = (props) => {
                             {note.isCompleted ? 'Completed' : 'Mark Complete'}
                         </label>
                     </div>
+                    {/* Edit and Delete buttons */}
                     <div className="actions">
                         <button className="btn btn-sm btn-outline-primary me-2"
                             onClick={() => updateNote(note)}
@@ -72,14 +80,18 @@ const Noteitem = (props) => {
                         </button>
                     </div>
                 </div>
+                {/* Note content */}
                 <div className="card-body">
+                    {/* Title with conditional styling for completed notes */}
                     <h5 className={`card-title ${note.isCompleted ? 'text-decoration-line-through text-muted' : ''}`}>
                         {note.title}
                     </h5>
+                    {/* Description with conditional styling for completed notes */}
                     <p className={`card-text ${note.isCompleted ? 'text-decoration-line-through text-muted' : ''}`}>
                         {note.description}
                     </p>
                 </div>
+                {/* Footer with timestamp */}
                 <div className="card-footer bg-transparent text-muted small">
                     <i className="far fa-clock me-1"></i>
                     {formatDate(note.date || note.createdAt)}
