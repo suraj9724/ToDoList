@@ -8,10 +8,18 @@ const Noteitem = (props) => {
     const { note, updateNote } = props;
 
     const handleDragStart = (e) => {
+        // Don't allow dragging if the note is completed
         if (note.isCompleted) {
             e.preventDefault();
             return;
         }
+
+        // Don't allow dragging if note has no due date
+        if (!note.dueDate) {
+            e.preventDefault();
+            return;
+        }
+
         e.target.classList.add('dragging');
         e.dataTransfer.setData('noteId', note._id);
         e.dataTransfer.setData('noteData', JSON.stringify(note));

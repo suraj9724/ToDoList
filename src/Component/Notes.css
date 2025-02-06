@@ -37,6 +37,7 @@
     min-height: 300px;
     padding: 16px;
     background-color: white;
+    transition: background-color 0.2s ease;
 }
 
 .day-column:last-child {
@@ -44,7 +45,13 @@
 }
 
 .day-column.drag-over {
-    background-color: #f7fafc;
+    background-color: #f0f9ff;
+    border: 2px dashed #3b82f6;
+}
+
+.day-column.drag-over-invalid {
+    background-color: #fee2e2;
+    border: 2px dashed #ef4444;
 }
 
 .day-header {
