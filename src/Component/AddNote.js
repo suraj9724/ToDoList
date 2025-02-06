@@ -12,8 +12,8 @@ const AddNote = () => {
         const selectedDate = new Date(note.dueDate);
         const currentDate = new Date();
 
-        // Allow the current date as a valid due date
-        if (selectedDate < currentDate.setHours(0, 0, 0, 0)) {
+        // Check if the selected date is in the past
+        if (selectedDate < currentDate) {
             setError("Due date cannot be in the past.");
             return;
         }
