@@ -10,6 +10,7 @@ const Notes = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showWeekends, setShowWeekends] = useState(true);
     const [dragError, setDragError] = useState('');
+    const [deleteAlert, setDeleteAlert] = useState('');
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
@@ -112,6 +113,13 @@ const Notes = () => {
         }
     };
 
+    const handleDelete = (message) => {
+        setDeleteAlert(message);
+        setTimeout(() => {
+            setDeleteAlert('');
+        }, 3000);
+    };
+
     return (
         <div className="calendar-container">
             <AddNote />
@@ -132,8 +140,14 @@ const Notes = () => {
             </div>
 
             {dragError && (
-                <div className="alert alert-danger mb-3" role="alert">
+                <div className="alert alert-warning mb-3" role="alert">
                     {dragError}
+                </div>
+            )}
+
+            {deleteAlert && (
+                <div className="alert alert-danger mb-3" role="alert">
+                    {deleteAlert}
                 </div>
             )}
 
@@ -180,6 +194,7 @@ const Notes = () => {
                                             description: note.description,
                                             dueDate: note.dueDate
                                         })}
+                                        onDelete={handleDelete}
                                     />
                                 ))
                             )}

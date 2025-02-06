@@ -11,6 +11,7 @@ const AddNote = () => {
         e.preventDefault();
         const selectedDate = new Date(note.dueDate);
         const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set time to midnight for comparison
 
         // Allow the current date as a valid due date
         if (selectedDate < currentDate.setHours(0, 0, 0, 0)) {
