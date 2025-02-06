@@ -46,17 +46,16 @@ const Notes = () => {
     const handleDragOver = (e, targetDate) => {
         e.preventDefault();
         const column = e.currentTarget;
-        
+
         // Only validate that target date is in the future
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         if (targetDate < today) {
             column.classList.add('drag-over-invalid');
             setDragError('Cannot move tasks to past dates');
             return;
         }
-        
         column.classList.add('drag-over');
         setDragError('');
     };
@@ -79,7 +78,6 @@ const Notes = () => {
             // Only validate that target date is in the future
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
             if (targetDate < today) {
                 setDragError('Cannot move tasks to past dates');
                 return;
@@ -99,10 +97,11 @@ const Notes = () => {
 
             // Then create a new note at the target date
             await context.addNote(noteData.description, formattedDate);
-            
             // Refresh notes to show the updated state
             await getNotes();
             
+            setDragError('');
+
             setDragError('');
 
         } catch (error) {

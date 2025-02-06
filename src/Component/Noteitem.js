@@ -1,34 +1,28 @@
 import React, { useContext } from 'react';
 import noteContext from '../context/notecontext';
 import './Noteitem.css';
-
 const Noteitem = (props) => {
     const context = useContext(noteContext);
     const { toggleComplete } = context;
     const { note, updateNote } = props;
-
     const handleDragStart = (e) => {
         // Don't allow dragging if the note is completed
         if (note.isCompleted) {
             e.preventDefault();
             return;
         }
-
         // Don't allow dragging if note has no due date
         if (!note.dueDate) {
             e.preventDefault();
             return;
         }
-
         e.target.classList.add('dragging');
         e.dataTransfer.setData('noteId', note._id);
         e.dataTransfer.setData('noteData', JSON.stringify(note));
     };
-
     const handleDragEnd = (e) => {
         e.target.classList.remove('dragging');
     };
-
     return (
         <div
             className='col-md-12 mb-3'
@@ -71,5 +65,4 @@ const Noteitem = (props) => {
         </div>
     );
 };
-
 export default Noteitem;

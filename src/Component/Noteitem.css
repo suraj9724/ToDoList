@@ -21,12 +21,3 @@
     text-decoration: line-through;
     color: #6c757d;
 }
-
-.draggable-note {
-    cursor: grab;
-}
-
-.draggable-note.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-}
