@@ -14,14 +14,15 @@
 .nav-button {
     padding: 8px 16px;
     border: 1px solid #e2e8f0;
-    background-color: white;
+    color: white;
+    background-color: #3b82f6;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .nav-button:hover {
-    background-color: #f7fafc;
+    background-color: #0d6efd;
 }
 
 .calendar-grid {
