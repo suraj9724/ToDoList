@@ -11,6 +11,7 @@ const AddNote = () => {
         e.preventDefault();
         const selectedDate = new Date(note.dueDate);
         const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Set time to midnight for comparison
 
         // Check if the selected date is in the past
         if (selectedDate < currentDate) {

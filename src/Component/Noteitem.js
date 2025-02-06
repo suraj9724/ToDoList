@@ -1,13 +1,15 @@
 import React, { useContext, useState } from 'react';
 import noteContext from '../context/notecontext';
 import EditNoteModal from './EditNoteModal';
+import DeleteConfirmModal from './DeleteConfirmModal';
 import './Noteitem.css';
 
 const Noteitem = (props) => {
     const context = useContext(noteContext);
     const { toggleComplete, deleteNote } = context;
-    const { note, updateNote } = props;
+    const { note, updateNote, onDelete } = props;
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const handleDragStart = (e) => {
         // Don't allow dragging if the note is completed
@@ -36,6 +38,24 @@ const Noteitem = (props) => {
     const handleSave = (updatedNote) => {
         updateNote(updatedNote);
         setShowEditModal(false);
+    };
+
+    const handleDeleteClick = () => {
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            await deleteNote(note._id);
+            onDelete('Task deleted successfully');
+        } catch (error) {
+            onDelete('Error deleting task');
+        }
+        setShowDeleteModal(false);
+    };
+
+    const handleDeleteCancel = () => {
+        setShowDeleteModal(false);
     };
 
     return (
@@ -78,7 +98,7 @@ const Noteitem = (props) => {
                                 </button>
                                 <button
                                     className="icon-btn"
-                                    onClick={() => deleteNote(note._id)}
+                                    onClick={handleDeleteClick}
                                     title='Delete note'
                                 >
                                     <img
@@ -99,6 +119,12 @@ const Noteitem = (props) => {
                     note={note}
                     onSave={handleSave}
                     onClose={() => setShowEditModal(false)}
+                />
+            )}
+            {showDeleteModal && (
+                <DeleteConfirmModal
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={handleDeleteCancel}
                 />
             )}
         </>
