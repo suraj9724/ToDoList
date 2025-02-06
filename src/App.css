@@ -32,7 +32,25 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.app-container {
+  min-height: calc(100vh - 56px);
+  padding-top: 1rem;
+  background-color: #f8f9fa;
+}
+
+/* Adjust content containers */
+.container,
+.container-fluid {
+  padding-top: 1rem;
+}
+
+/* Adjust login/signup pages */
+.min-vh-100 {
+  min-height: calc(100vh - 56px) !important;
 }
