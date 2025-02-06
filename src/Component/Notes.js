@@ -1,20 +1,20 @@
 import React, { useState, useContext, useEffect } from 'react';
 import noteContext from '../context/notecontext';
 import Noteitem from './Noteitem';
-import AddNote from './AddNote';
+// import AddNote from './AddNote';
 import './Notes.css';
 
 const Notes = () => {
     const context = useContext(noteContext);
-    const { notes, getNotes, editNote } = context;
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const [showWeekends, setShowWeekends] = useState(true);
-    const [dragError, setDragError] = useState('');
-    const [deleteAlert, setDeleteAlert] = useState('');
+    const { notes, getNotes, editNote } = context; // Extract notes and functions from context
+    const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
+    const [showWeekends, setShowWeekends] = useState(true); // State to toggle weekends visibility
+    const [dragError, setDragError] = useState(''); // State for drag error messages
+    const [deleteAlert, setDeleteAlert] = useState(''); // State for delete alert messages
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
-            getNotes();
+            getNotes(); // Fetch notes if token exists
         }
     }, []);
 
@@ -23,25 +23,25 @@ const Notes = () => {
         const day = start.getDay();
         const diff = start.getDate() - day + (day === 0 ? -6 : 1);
         start.setDate(diff);
-        return start;
+        return start; // Get the start date of the week
     };
 
-    const startOfWeek = getStartOfWeek(selectedDate);
+    const startOfWeek = getStartOfWeek(selectedDate); // Calculate the start of the week based on selected date
 
     const handlePrevWeek = () => {
         const newDate = new Date(selectedDate);
-        newDate.setDate(newDate.getDate() - 7);
+        newDate.setDate(newDate.getDate() - 7); // Move to the previous week
         setSelectedDate(newDate);
     };
 
     const handleNextWeek = () => {
         const newDate = new Date(selectedDate);
-        newDate.setDate(newDate.getDate() + 7);
+        newDate.setDate(newDate.getDate() + 7); // Move to the next week
         setSelectedDate(newDate);
     };
 
     const toggleWeekends = () => {
-        setShowWeekends(!showWeekends);
+        setShowWeekends(!showWeekends); // Toggle the visibility of weekends
     };
 
     const handleDragOver = (e, targetDate) => {
@@ -103,8 +103,6 @@ const Notes = () => {
 
             setDragError('');
 
-            setDragError('');
-
         } catch (error) {
             console.error('Error in handleDrop:', error);
             setDragError('Error moving task. Please try again.');
@@ -122,7 +120,7 @@ const Notes = () => {
 
     return (
         <div className="calendar-container">
-            <AddNote />
+            {/* <AddNote /> Component for adding a new note */}
 
             <div className="calendar-header">
                 <div className="nav-buttons">
@@ -134,7 +132,7 @@ const Notes = () => {
                     </button>
                 </div>
                 <h2>{startOfWeek.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
-                <button className="weekend-toggle" onClick={toggleWeekends}>
+                <button className="nav-button" onClick={toggleWeekends}>
                     {showWeekends ? 'Hide Weekends' : 'Show Weekends'}
                 </button>
             </div>

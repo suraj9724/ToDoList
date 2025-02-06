@@ -25,4 +25,4 @@ const DeleteConfirmModal = ({ onConfirm, onCancel }) => {
     );
 };
 
-export default DeleteConfirmModal; 
+export default DeleteConfirmModal;

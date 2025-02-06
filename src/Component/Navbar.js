@@ -1,13 +1,23 @@
-import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import AddNote from './AddNote'; // Import the AddNote component
 
 const Navbar = () => {
-  let location = useLocation();
-  let navigate = useNavigate();
+  let location = useLocation(); // Get the current location
+  let navigate = useNavigate(); // Hook to programmatically navigate
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false); // State to manage modal visibility
+
+  // Handle user logout
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem('token'); // Remove token from local storage
+    navigate('/login'); // Redirect to login page
   }
+
+  // Handle adding a new task
+  const handleAddTask = () => {
+    setShowAddNoteModal(true); // Show the AddNote modal
+  }
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -25,15 +35,30 @@ const Navbar = () => {
                 <Link className={`nav-link ${location.pathname === '/about' ? "active" : ""}`} to="/about">About</Link>
               </li>
             </ul>
-            {!localStorage.getItem('token') ? <form className="d-flex">
-              <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
-              <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>
-            </form> : <button onClick={handleLogout} className='btn btn-primary'>Logout</button>}
+            {!localStorage.getItem('token') ? (
+              <form className="d-flex">
+                <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
+                <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>
+              </form>
+            ) : (
+              <div className="d-flex">
+                <button onClick={handleAddTask} className='btn btn-primary mx-1'>Add Task</button>
+                <button onClick={handleLogout} className='btn btn-primary'>Logout</button>
+              </div>
+            )}
           </div>
         </div>
       </nav>
       <div style={{ height: '56px' }}></div>
+
+      {/* AddNote Modal */}
+      {showAddNoteModal && (
+        <div className="modal" style={{ display: 'block' }}>
+          <AddNote onClose={() => setShowAddNoteModal(false)} /> {/* Pass the onClose function */}
+        </div>
+      )}
     </>
   );
 }
+
 export default Navbar;

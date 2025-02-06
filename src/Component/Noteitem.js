@@ -11,6 +11,7 @@ const Noteitem = (props) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+    // Handle the start of dragging a note
     const handleDragStart = (e) => {
         // Don't allow dragging if the note is completed
         if (note.isCompleted) {
@@ -27,23 +28,28 @@ const Noteitem = (props) => {
         e.dataTransfer.setData('noteData', JSON.stringify(note));
     };
 
+    // Handle the end of dragging a note
     const handleDragEnd = (e) => {
         e.target.classList.remove('dragging');
     };
 
+    // Show the edit modal
     const handleEdit = () => {
         setShowEditModal(true);
     };
 
+    // Save the updated note
     const handleSave = (updatedNote) => {
         updateNote(updatedNote);
         setShowEditModal(false);
     };
 
+    // Show the delete confirmation modal
     const handleDeleteClick = () => {
         setShowDeleteModal(true);
     };
 
+    // Confirm deletion of the note
     const handleDeleteConfirm = async () => {
         try {
             await deleteNote(note._id);
@@ -54,6 +60,7 @@ const Noteitem = (props) => {
         setShowDeleteModal(false);
     };
 
+    // Cancel the deletion of the note
     const handleDeleteCancel = () => {
         setShowDeleteModal(false);
     };

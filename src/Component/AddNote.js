@@ -1,12 +1,14 @@
 import React, { useState, useContext } from 'react';
 import noteContext from '../context/notecontext';
 
-const AddNote = () => {
+// Component for adding a new note
+const AddNote = ({ onClose }) => { // Accept onClose prop
     const context = useContext(noteContext);
-    const { addNote } = context;
-    const [note, setNote] = useState({ description: "", dueDate: "" });
-    const [error, setError] = useState("");
+    const { addNote } = context; // Extract addNote function from context
+    const [note, setNote] = useState({ description: "", dueDate: "" }); // State for note details
+    const [error, setError] = useState(""); // State for error messages
 
+    // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         const selectedDate = new Date(note.dueDate);
@@ -20,10 +22,12 @@ const AddNote = () => {
         }
 
         setError(""); // Clear any previous error
-        addNote(note.description.trim(), note.dueDate);
-        setNote({ description: "", dueDate: "" });
+        addNote(note.description.trim(), note.dueDate); // Call addNote function with note details
+        setNote({ description: "", dueDate: "" }); // Reset note state
+        onClose(); // Close the modal after adding the note
     };
 
+    // Handle input changes
     const onChange = (e) => {
         setNote({ ...note, [e.target.name]: e.target.value });
     };

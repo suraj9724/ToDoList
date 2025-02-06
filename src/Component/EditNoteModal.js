@@ -4,6 +4,7 @@ import './EditNoteModal.css';
 const EditNoteModal = ({ note, onSave, onClose }) => {
     const [editedDescription, setEditedDescription] = useState(note.description);
 
+    // Handle form submission to save the edited note
     const handleSubmit = (e) => {
         e.preventDefault();
         onSave({
@@ -47,4 +48,4 @@ const EditNoteModal = ({ note, onSave, onClose }) => {
     );
 };
 
-export default EditNoteModal; 
+export default EditNoteModal;
