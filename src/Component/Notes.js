@@ -6,9 +6,10 @@ import './Notes.css';
 
 const Notes = () => {
     const context = useContext(noteContext);
-    const { notes, getNotes, editNote } = context; // Changed from updateNote to editNote
+    const { notes, getNotes, editNote } = context;
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showWeekends, setShowWeekends] = useState(true);
+    const [dragError, setDragError] = useState('');
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
@@ -42,51 +43,76 @@ const Notes = () => {
         setShowWeekends(!showWeekends);
     };
 
-    const handleDragOver = (e) => {
+    const handleDragOver = (e, targetDate) => {
         e.preventDefault();
         const column = e.currentTarget;
+
+        // Only validate that target date is in the future
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (targetDate < today) {
+            column.classList.add('drag-over-invalid');
+            setDragError('Cannot move tasks to past dates');
+            return;
+        }
+
         column.classList.add('drag-over');
+        setDragError('');
     };
 
     const handleDragLeave = (e) => {
         e.currentTarget.classList.remove('drag-over');
+        e.currentTarget.classList.remove('drag-over-invalid');
+        setDragError('');
     };
 
     const handleDrop = async (e, targetDate) => {
         e.preventDefault();
         e.currentTarget.classList.remove('drag-over');
+        e.currentTarget.classList.remove('drag-over-invalid');
 
         try {
             const noteId = e.dataTransfer.getData('noteId');
             const noteData = JSON.parse(e.dataTransfer.getData('noteData'));
 
-            console.log('Dropped note data:', noteData);
-            console.log('Target date:', targetDate);
+            // Only validate that target date is in the future
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (targetDate < today) {
+                setDragError('Cannot move tasks to past dates');
+                return;
+            }
 
             // Only allow dragging incomplete tasks
             if (noteData.isCompleted) {
-                console.log('Cannot move completed tasks');
+                setDragError('Cannot move completed tasks');
                 return;
             }
 
             // Format target date as YYYY-MM-DD
             const formattedDate = targetDate.toISOString().split('T')[0];
-            console.log('Formatted date:', formattedDate);
 
-            // Update note with new dueDate
-            await editNote(noteId, {
-                dueDate: formattedDate,
-                description: noteData.description
-            });
+            // First delete the note from its current position
+            await context.deleteNote(noteId);
 
-            // Refresh notes list
+            // Then create a new note at the target date
+            await context.addNote(noteData.description, formattedDate);
+
+            // Refresh notes to show the updated state
             await getNotes();
 
-            console.log('Note updated successfully');
+            setDragError('');
+
         } catch (error) {
             console.error('Error in handleDrop:', error);
+            setDragError('Error moving task. Please try again.');
+            // Refresh notes to ensure UI is in sync
+            await getNotes();
         }
     };
+
     return (
         <div className="calendar-container">
             <AddNote />
@@ -105,6 +131,12 @@ const Notes = () => {
                     {showWeekends ? 'Hide Weekends' : 'Show Weekends'}
                 </button>
             </div>
+
+            {dragError && (
+                <div className="alert alert-danger mb-3" role="alert">
+                    {dragError}
+                </div>
+            )}
 
             <div
                 className="calendar-grid"
@@ -128,7 +160,7 @@ const Notes = () => {
                         <div
                             key={index}
                             className="day-column"
-                            onDragOver={handleDragOver}
+                            onDragOver={(e) => handleDragOver(e, day)}
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, day)}
                         >
@@ -145,7 +177,10 @@ const Notes = () => {
                                     <Noteitem
                                         key={note._id}
                                         note={note}
-                                        updateNote={(note) => editNote(note._id, note.description, note.dueDate)}
+                                        updateNote={(note) => editNote(note._id, {
+                                            description: note.description,
+                                            dueDate: note.dueDate
+                                        })}
                                     />
                                 ))
                             )}
