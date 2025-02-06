@@ -52,20 +52,19 @@ const Notestate = (props) => {
     };
 
     const deleteNote = async (id) => {
-        if (window.confirm("Are you sure you want to delete this note?")) {
-            try {
-                await fetch(`${host}/api/note/deletenote/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'auth-token': localStorage.getItem('token')
-                    }
-                });
-                setNotes(notes.filter((note) => note._id !== id));
-            } catch (error) {
-                console.error(error.message);
-            }
+        try {
+            await fetch(`${host}/api/note/deletenote/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('token')
+                }
+            });
+            setNotes(notes.filter((note) => note._id !== id));
+        } catch (error) {
+            console.error(error.message);
         }
+
     };
 
     const editNote = async (id, updates) => {

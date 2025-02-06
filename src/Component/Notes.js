@@ -100,7 +100,7 @@ const Notes = () => {
             await context.addNote(noteData.description, formattedDate);
             // Refresh notes to show the updated state
             await getNotes();
-            
+
             setDragError('');
 
             setDragError('');
