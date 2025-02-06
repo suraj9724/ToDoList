@@ -7,10 +7,6 @@ const NotesSchema = new Schema({
         ref: 'user',
         required: true
     },
-    title: {
-        type: String,
-        required: true
-    },
     description: {
         type: String,
         required: true
@@ -18,6 +14,18 @@ const NotesSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    dueDate: {
+        type: Date,
+        required: true
+    },
+    day: {
+        type: String,
+        required: true,
+        default: () => {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return days[new Date().getDay()];
+        }
     },
     isCompleted: {
         type: Boolean,
@@ -27,4 +35,4 @@ const NotesSchema = new Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('notes', NotesSchema); 
+module.exports = mongoose.model('notes', NotesSchema);

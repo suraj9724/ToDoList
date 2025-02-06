@@ -1,157 +1,160 @@
-import React, { useState, useContext, useEffect } from 'react'
-import noteContext from '../context/notecontext'
-import Noteitem from './Noteitem'
-import AddNote from './AddNote'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useContext, useEffect } from 'react';
+import noteContext from '../context/notecontext';
+import Noteitem from './Noteitem';
+import AddNote from './AddNote';
+import './Notes.css';
 
 const Notes = () => {
-    // Initialize navigation
-    const navigate = useNavigate()
+    const context = useContext(noteContext);
+    const { notes, getNotes, editNote } = context; // Changed from updateNote to editNote
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showWeekends, setShowWeekends] = useState(true);
 
-    // Get context and required functions
-    const context = useContext(noteContext)
-    const { notes, getNotes, editNote } = context
-
-    // State for managing note editing and modal
-    const [note, setNote] = useState({ id: "", etitle: "", edescription: "" })
-    const [modal, setModal] = useState(null)
-
-    // Effect to check authentication and fetch notes
     useEffect(() => {
         if (localStorage.getItem('token')) {
             getNotes();
         }
-        else {
-            navigate('/login');
-        }
-        // eslint-disable-next-line
-    }, [])
+    }, []);
 
-    // Effect to initialize Bootstrap modal
-    useEffect(() => {
-        // Initialize modal
-        const modalElement = document.getElementById('exampleModal')
-        if (modalElement) {
-            const bootstrapModal = new window.bootstrap.Modal(modalElement)
-            setModal(bootstrapModal)
+    const getStartOfWeek = (date) => {
+        const start = new Date(date);
+        const day = start.getDay();
+        const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+        start.setDate(diff);
+        return start;
+    };
 
-            // Add event listener for modal close
-            modalElement.addEventListener('hidden.bs.modal', () => {
-                setNote({ id: "", etitle: "", edescription: "" });
-            });
-        }
-    }, [])
+    const startOfWeek = getStartOfWeek(selectedDate);
 
-    // Handler for updating note details
-    const updateNote = (currentNote) => {
-        setNote({
-            id: currentNote._id,
-            etitle: currentNote.title,
-            edescription: currentNote.description
-        })
-        modal?.show()
-    }
+    const handlePrevWeek = () => {
+        const newDate = new Date(selectedDate);
+        newDate.setDate(newDate.getDate() - 7);
+        setSelectedDate(newDate);
+    };
 
-    // Handler for form submission
-    const handleSubmit = async (e) => {
+    const handleNextWeek = () => {
+        const newDate = new Date(selectedDate);
+        newDate.setDate(newDate.getDate() + 7);
+        setSelectedDate(newDate);
+    };
+
+    const toggleWeekends = () => {
+        setShowWeekends(!showWeekends);
+    };
+
+    const handleDragOver = (e) => {
         e.preventDefault();
+        const column = e.currentTarget;
+        column.classList.add('drag-over');
+    };
+
+    const handleDragLeave = (e) => {
+        e.currentTarget.classList.remove('drag-over');
+    };
+
+    const handleDrop = async (e, targetDate) => {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+
         try {
-            await editNote(note.id, note.etitle, note.edescription);
-            modal?.hide();
+            const noteId = e.dataTransfer.getData('noteId');
+            const noteData = JSON.parse(e.dataTransfer.getData('noteData'));
+
+            console.log('Dropped note data:', noteData);
+            console.log('Target date:', targetDate);
+
+            // Only allow dragging incomplete tasks
+            if (noteData.isCompleted) {
+                console.log('Cannot move completed tasks');
+                return;
+            }
+
+            // Format target date as YYYY-MM-DD
+            const formattedDate = targetDate.toISOString().split('T')[0];
+            console.log('Formatted date:', formattedDate);
+
+            // Update note with new dueDate
+            await editNote(noteId, {
+                dueDate: formattedDate,
+                description: noteData.description
+            });
+
+            // Refresh notes list
+            await getNotes();
+
+            console.log('Note updated successfully');
         } catch (error) {
-            console.error('Failed to update note:', error);
-            // Optionally show error to user
+            console.error('Error in handleDrop:', error);
         }
-    }
-
-    // Handler for input changes
-    const onChange = (e) => {
-        setNote({ ...note, [e.target.name]: e.target.value })
-    }
-
+    };
     return (
-        <div className="container-fluid py-4">
-            {/* Add Note Component */}
+        <div className="calendar-container">
             <AddNote />
 
-            {/* Edit Note Modal */}
-            <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Edit Note</h5>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form onSubmit={handleSubmit}>
-                            <div className="modal-body">
-                                {/* Title Input */}
-                                <div className="mb-3">
-                                    <label htmlFor="etitle" className="form-label">Title</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="etitle"
-                                        name="etitle"
-                                        value={note.etitle}
-                                        onChange={onChange}
-                                        minLength={3}
-                                        required
-                                    />
-                                </div>
-                                {/* Description Input */}
-                                <div className="mb-3">
-                                    <label htmlFor="edescription" className="form-label">Description</label>
-                                    <textarea
-                                        className="form-control"
-                                        name="edescription"
-                                        id="edescription"
-                                        value={note.edescription}
-                                        onChange={onChange}
-                                        minLength={5}
-                                        required
-                                        rows="3"
-                                    ></textarea>
-                                </div>
-                            </div>
-                            {/* Modal Footer with Action Buttons */}
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary"
-                                    disabled={note.etitle.length < 3 || note.edescription.length < 5}
-                                >
-                                    Save Changes
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+            <div className="calendar-header">
+                <div className="nav-buttons">
+                    <button className="nav-button" onClick={handlePrevWeek}>
+                        Previous Week
+                    </button>
+                    <button className="nav-button" onClick={handleNextWeek}>
+                        Next Week
+                    </button>
                 </div>
+                <h2>{startOfWeek.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
+                <button className="weekend-toggle" onClick={toggleWeekends}>
+                    {showWeekends ? 'Hide Weekends' : 'Show Weekends'}
+                </button>
             </div>
 
-            {/* Notes Display Section */}
-            <div className="container mt-4">
-                <h2 className="text-center mb-4">Your Notes</h2>
-                {notes.length === 0 ? (
-                    // Empty state message
-                    <div className="text-center text-muted">
-                        <i className="fas fa-notebook fa-3x mb-3"></i>
-                        <h5>No notes yet</h5>
-                        <p>Add your first note above!</p>
-                    </div>
-                ) : (
-                    // Notes Grid
-                    <div className="row">
-                        {notes
-                            .sort((a, b) => new Date(b.date) - new Date(a.date))
-                            .map((note) => (
-                                <Noteitem key={note._id} updateNote={updateNote} note={note} />
-                            ))}
-                    </div>
-                )}
+            <div
+                className="calendar-grid"
+                style={{
+                    gridTemplateColumns: `repeat(${showWeekends ? 7 : 5}, 1fr)`
+                }}
+            >
+                {Array.from({ length: 7 }).map((_, index) => {
+                    const day = new Date(startOfWeek);
+                    day.setDate(day.getDate() + index);
+                    const filteredNotes = notes.filter(note => {
+                        const noteDate = new Date(note.dueDate);
+                        return noteDate.toDateString() === day.toDateString();
+                    });
+
+                    if (!showWeekends && (day.getDay() === 0 || day.getDay() === 6)) {
+                        return null;
+                    }
+
+                    return (
+                        <div
+                            key={index}
+                            className="day-column"
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, day)}
+                        >
+                            <div className="day-header">
+                                <h5 className="mb-1">
+                                    {day.toLocaleString('en-US', { weekday: 'short' })}
+                                </h5>
+                                <p className="mb-0">{day.getDate()}</p>
+                            </div>
+                            {filteredNotes.length === 0 ? (
+                                <p className="empty-day">No tasks</p>
+                            ) : (
+                                filteredNotes.map(note => (
+                                    <Noteitem
+                                        key={note._id}
+                                        note={note}
+                                        updateNote={(note) => editNote(note._id, note.description, note.dueDate)}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    );
+                })}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Notes
+export default Notes;
