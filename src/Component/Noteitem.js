@@ -10,16 +10,18 @@ const Noteitem = (props) => {
     const [showEditModal, setShowEditModal] = useState(false);
 
     const handleDragStart = (e) => {
-        // Don't allow dragging if the note is completed
         if (note.isCompleted) {
             e.preventDefault();
             return;
         }
+<<<<<<< HEAD
         // Don't allow dragging if note has no due date
         if (!note.dueDate) {
             e.preventDefault();
             return;
         }
+=======
+>>>>>>> parent of 81f2f23 (added drag and drop feature)
         e.target.classList.add('dragging');
         e.dataTransfer.setData('noteId', note._id);
         e.dataTransfer.setData('noteData', JSON.stringify(note));
