@@ -16,6 +16,7 @@ const Notes = () => {
         if (localStorage.getItem('token')) {
             getNotes(); // Fetch notes if token exists
         }
+        // eslint-disable-next-line
     }, []);
 
     const getStartOfWeek = (date) => {

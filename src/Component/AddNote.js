@@ -38,7 +38,10 @@ const AddNote = ({ onClose }) => { // Accept onClose prop
                 <div className="col-md-8">
                     <div className="card shadow-sm">
                         <div className="card-body">
-                            <h4 className="card-title mb-4 text-center">Add a New Task</h4>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h4 className="card-title mb-4">Add a New Task</h4>
+                                <button onClick={onClose} className="btn-close" aria-label="Close"></button>
+                            </div>
                             {error && <div className="alert alert-danger">{error}</div>}
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
