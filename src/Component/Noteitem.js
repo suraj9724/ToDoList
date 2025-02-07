@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import noteContext from '../context/notecontext';
 import EditNoteModal from './EditNoteModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
+import ShowTaskModal from './ShowTaskModal';
 import './Noteitem.css';
 
 const Noteitem = (props) => {
@@ -10,15 +11,13 @@ const Noteitem = (props) => {
     const { note, updateNote, onDelete } = props;
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showShowTaskModal, setShowShowTaskModal] = useState(false);
 
-    // Handle the start of dragging a note
     const handleDragStart = (e) => {
-        // Don't allow dragging if the note is completed
         if (note.isCompleted) {
             e.preventDefault();
             return;
         }
-        // Don't allow dragging if note has no due date
         if (!note.dueDate) {
             e.preventDefault();
             return;
@@ -28,28 +27,13 @@ const Noteitem = (props) => {
         e.dataTransfer.setData('noteData', JSON.stringify(note));
     };
 
-    // Handle the end of dragging a note
     const handleDragEnd = (e) => {
         e.target.classList.remove('dragging');
     };
-
-    // Show the edit modal
-    const handleEdit = () => {
-        setShowEditModal(true);
+    const handleShowTask = () => {
+        setShowShowTaskModal(true);
     };
 
-    // Save the updated note
-    const handleSave = (updatedNote) => {
-        updateNote(updatedNote);
-        setShowEditModal(false);
-    };
-
-    // Show the delete confirmation modal
-    const handleDeleteClick = () => {
-        setShowDeleteModal(true);
-    };
-
-    // Confirm deletion of the note
     const handleDeleteConfirm = async () => {
         try {
             await deleteNote(note._id);
@@ -60,9 +44,9 @@ const Noteitem = (props) => {
         setShowDeleteModal(false);
     };
 
-    // Cancel the deletion of the note
-    const handleDeleteCancel = () => {
-        setShowDeleteModal(false);
+    const handleEditSave = (editedNote) => {
+        updateNote(editedNote);
+        setShowEditModal(false);
     };
 
     return (
@@ -83,55 +67,24 @@ const Noteitem = (props) => {
                                 onChange={() => toggleComplete(note._id)}
                                 id={`checkbox-${note._id}`}
                             />
-                            <label
-                                className={`form-check-label mb-0 flex-grow-1 ${note.isCompleted ? 'completed-note' : ''}`}
-                                htmlFor={`checkbox-${note._id}`}
-                            >
-                                {note.description}
+                            <label className={`form-check-label mb-0 flex-grow-1 ${note.isCompleted ? 'completed-note' : ''}`} htmlFor={`checkbox-${note._id}`}>
+                                <strong>{note.title}</strong>
                             </label>
-                            <div className="d-flex align-items-center">
-                                <button
-                                    className="icon-btn me-2"
-                                    onClick={handleEdit}
-                                    title='Edit note'
-                                >
-                                    <img
-                                        src="/edit-icon.png"
-                                        alt="Edit"
-                                        className="action-icon"
-                                        width="20"
-                                        height="20"
-                                    />
-                                </button>
-                                <button
-                                    className="icon-btn"
-                                    onClick={handleDeleteClick}
-                                    title='Delete note'
-                                >
-                                    <img
-                                        src="/delete-icon.png"
-                                        alt="Delete"
-                                        className="action-icon"
-                                        width="20"
-                                        height="20"
-                                    />
-                                </button>
-                            </div>
+                        </div>
+                        <div className="d-flex align-items-center">
+                            <button className="icon-btn me-2" onClick={handleShowTask} title='Show task'>
+                                <img src="/eye-icon.svg" alt="Show" className="action-icon" width="20" height="20" />
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            {showEditModal && (
-                <EditNoteModal
+            {showShowTaskModal && (
+                <ShowTaskModal
                     note={note}
-                    onSave={handleSave}
-                    onClose={() => setShowEditModal(false)}
-                />
-            )}
-            {showDeleteModal && (
-                <DeleteConfirmModal
-                    onConfirm={handleDeleteConfirm}
-                    onCancel={handleDeleteCancel}
+                    onEdit={handleEditSave}
+                    onDelete={handleDeleteConfirm} // Trigger delete confirmation
+                    onClose={() => setShowShowTaskModal(false)}
                 />
             )}
         </>

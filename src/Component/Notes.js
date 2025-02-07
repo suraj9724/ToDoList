@@ -1,22 +1,20 @@
 import React, { useState, useContext, useEffect } from 'react';
 import noteContext from '../context/notecontext';
 import Noteitem from './Noteitem';
-// import AddNote from './AddNote';
 import './Notes.css';
 
 const Notes = () => {
     const context = useContext(noteContext);
-    const { notes, getNotes, editNote } = context; // Extract notes and functions from context
-    const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
-    const [showWeekends, setShowWeekends] = useState(true); // State to toggle weekends visibility
-    const [dragError, setDragError] = useState(''); // State for drag error messages
-    const [deleteAlert, setDeleteAlert] = useState(''); // State for delete alert messages
+    const { notes, getNotes, editNote } = context;
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showWeekends, setShowWeekends] = useState(true);
+    const [dragError, setDragError] = useState('');
+    const [deleteAlert, setDeleteAlert] = useState('');
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
-            getNotes(); // Fetch notes if token exists
+            getNotes();
         }
-        // eslint-disable-next-line
     }, []);
 
     const getStartOfWeek = (date) => {
@@ -24,32 +22,31 @@ const Notes = () => {
         const day = start.getDay();
         const diff = start.getDate() - day + (day === 0 ? -6 : 1);
         start.setDate(diff);
-        return start; // Get the start date of the week
+        return start;
     };
 
-    const startOfWeek = getStartOfWeek(selectedDate); // Calculate the start of the week based on selected date
+    const startOfWeek = getStartOfWeek(selectedDate);
 
     const handlePrevWeek = () => {
         const newDate = new Date(selectedDate);
-        newDate.setDate(newDate.getDate() - 7); // Move to the previous week
+        newDate.setDate(newDate.getDate() - 7);
         setSelectedDate(newDate);
     };
 
     const handleNextWeek = () => {
         const newDate = new Date(selectedDate);
-        newDate.setDate(newDate.getDate() + 7); // Move to the next week
+        newDate.setDate(newDate.getDate() + 7);
         setSelectedDate(newDate);
     };
 
     const toggleWeekends = () => {
-        setShowWeekends(!showWeekends); // Toggle the visibility of weekends
+        setShowWeekends(!showWeekends);
     };
 
     const handleDragOver = (e, targetDate) => {
         e.preventDefault();
         const column = e.currentTarget;
 
-        // Only validate that target date is in the future
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -77,7 +74,6 @@ const Notes = () => {
             const noteId = e.dataTransfer.getData('noteId');
             const noteData = JSON.parse(e.dataTransfer.getData('noteData'));
 
-            // Only validate that target date is in the future
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             if (targetDate < today) {
@@ -85,20 +81,18 @@ const Notes = () => {
                 return;
             }
 
-            // Only allow dragging incomplete tasks
             if (noteData.isCompleted) {
                 setDragError('Cannot move completed tasks');
                 return;
             }
 
-            // Format target date as YYYY-MM-DD
             const formattedDate = targetDate.toISOString().split('T')[0];
 
             // First delete the note from its current position
             await context.deleteNote(noteId);
 
             // Then create a new note at the target date
-            await context.addNote(noteData.description, formattedDate);
+            await context.addNote(noteData.title, noteData.description, formattedDate); // Ensure title is included
             // Refresh notes to show the updated state
             await getNotes();
 
@@ -107,7 +101,6 @@ const Notes = () => {
         } catch (error) {
             console.error('Error in handleDrop:', error);
             setDragError('Error moving task. Please try again.');
-            // Refresh notes to ensure UI is in sync
             await getNotes();
         }
     };
@@ -121,8 +114,6 @@ const Notes = () => {
 
     return (
         <div className="calendar-container">
-            {/* <AddNote /> Component for adding a new note */}
-
             <div className="calendar-header">
                 <div className="nav-buttons">
                     <button className="nav-button" onClick={handlePrevWeek}>

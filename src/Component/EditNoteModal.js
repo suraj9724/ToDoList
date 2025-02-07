@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './EditNoteModal.css';
 
 const EditNoteModal = ({ note, onSave, onClose }) => {
+    const [editedTitle, setEditedTitle] = useState(note.title);
     const [editedDescription, setEditedDescription] = useState(note.description);
 
     // Handle form submission to save the edited note
@@ -9,6 +10,7 @@ const EditNoteModal = ({ note, onSave, onClose }) => {
         e.preventDefault();
         onSave({
             ...note,
+            title: editedTitle,
             description: editedDescription
         });
     };
@@ -22,6 +24,17 @@ const EditNoteModal = ({ note, onSave, onClose }) => {
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
+                        <div className="form-group">
+                            <label htmlFor="title">Title</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="title"
+                                value={editedTitle}
+                                onChange={(e) => setEditedTitle(e.target.value)}
+                                required
+                            />
+                        </div>
                         <div className="form-group">
                             <label htmlFor="description">Description</label>
                             <input

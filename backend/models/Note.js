@@ -7,6 +7,10 @@ const NotesSchema = new Schema({
         ref: 'user',
         required: true
     },
+    title: {  // Adding title field
+        type: String,
+        required: true
+    },
     description: {
         type: String,
         required: true

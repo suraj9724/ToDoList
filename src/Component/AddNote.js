@@ -2,29 +2,28 @@ import React, { useState, useContext } from 'react';
 import noteContext from '../context/notecontext';
 
 // Component for adding a new note
-const AddNote = ({ onClose }) => { // Accept onClose prop
+const AddNote = ({ onClose }) => {
     const context = useContext(noteContext);
-    const { addNote } = context; // Extract addNote function from context
-    const [note, setNote] = useState({ description: "", dueDate: "" }); // State for note details
-    const [error, setError] = useState(""); // State for error messages
+    const { addNote } = context;
+    const [note, setNote] = useState({ title: "", description: "", dueDate: "" }); // Added title to state
+    const [error, setError] = useState("");
 
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         const selectedDate = new Date(note.dueDate);
         const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0); // Set time to midnight for comparison
+        currentDate.setHours(0, 0, 0, 0);
 
-        // Allow the current date as a valid due date
         if (selectedDate < currentDate.setHours(0, 0, 0, 0)) {
             setError("Due date cannot be in the past.");
             return;
         }
 
-        setError(""); // Clear any previous error
-        addNote(note.description.trim(), note.dueDate); // Call addNote function with note details
-        setNote({ description: "", dueDate: "" }); // Reset note state
-        onClose(); // Close the modal after adding the note
+        setError("");
+        addNote(note.title.trim(), note.description.trim(), note.dueDate); // Call addNote with title
+        setNote({ title: "", description: "", dueDate: "" }); // Reset note state
+        onClose();
     };
 
     // Handle input changes
@@ -44,6 +43,19 @@ const AddNote = ({ onClose }) => { // Accept onClose prop
                             </div>
                             {error && <div className="alert alert-danger">{error}</div>}
                             <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="title" className="form-label">Title</label> {/* New title label */}
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="title"
+                                        name="title"
+                                        value={note.title}
+                                        onChange={onChange}
+                                        required
+                                        placeholder="Enter title"
+                                    />
+                                </div>
                                 <div className="mb-3">
                                     <label htmlFor="description" className="form-label">Description</label>
                                     <textarea

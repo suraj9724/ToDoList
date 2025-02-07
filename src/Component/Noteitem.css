@@ -1,5 +1,6 @@
 .card {
-    background-color: #FFFFFF; /* Card Background */
+    background-color: #FFFFFF;
+    /* Card Background */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -9,12 +10,14 @@
 }
 
 .form-check-input {
-    background-color: white; /* Primary Color */
+    background-color: white;
+    /* Primary Color */
 }
 
 .completed-note {
     text-decoration: line-through;
-    color: #94A3B8; /* Medium Gray */
+    color: #94A3B8;
+    /* Medium Gray */
 }
 
 .icon-btn {
@@ -24,17 +27,8 @@
 }
 
 .action-icon {
-    width: 20px;
-    height: 20px;
-}
-
-.edit-btn {
-    border: none;
-    background: none;
-    padding: 4px;
-    transition: transform 0.2s ease;
-}
-
-.edit-btn:hover {
-    transform: scale(1.1);
+    width: 16px;
+    /* Adjusted size */
+    height: 16px;
+    /* Adjusted size */
 }

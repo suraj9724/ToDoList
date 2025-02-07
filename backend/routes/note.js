@@ -16,12 +16,13 @@ router.get('/fetchNotes', fetchuser, async (req, res) => {
 
 router.post('/addnote', fetchuser,
     [
+        body('title').notEmpty().withMessage('Title is required'), // Validation for title
         body('description').isLength({ min: 5 }).withMessage('Description must be at least 5 characters'),
         body('dueDate').isISO8601().withMessage('Due date must be a valid date')
     ],
     async (req, res) => {
         try {
-            const { description, dueDate, isCompleted, date } = req.body;
+            const { title, description, dueDate, isCompleted, date } = req.body;
 
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -29,6 +30,7 @@ router.post('/addnote', fetchuser,
             }
 
             const note = new Note({
+                title, // Include title in note creation
                 description,
                 user: req.user.id,
                 date: date || new Date(),
@@ -47,7 +49,7 @@ router.post('/addnote', fetchuser,
 
 router.patch('/updatenote/:id', fetchuser, async (req, res) => {
     try {
-        const { description, isCompleted } = req.body;
+        const { title, description, isCompleted } = req.body;
 
         let note = await Note.findById(req.params.id);
         if (!note) {
@@ -59,6 +61,7 @@ router.patch('/updatenote/:id', fetchuser, async (req, res) => {
         }
 
         const updateFields = {};
+        if (title !== undefined) updateFields.title = title; // Allow updating title
         if (description !== undefined) updateFields.description = description;
         if (isCompleted !== undefined) updateFields.isCompleted = isCompleted;
 

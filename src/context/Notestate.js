@@ -28,7 +28,7 @@ const Notestate = (props) => {
         }
     };
 
-    const addNote = async (description, dueDate) => {
+    const addNote = async (title, description, dueDate) => { // Updated to include title
         try {
             const currentDate = new Date().toISOString();
             const response = await fetch(`${host}/api/note/addnote`, {
@@ -38,6 +38,7 @@ const Notestate = (props) => {
                     'auth-token': localStorage.getItem('token')
                 },
                 body: JSON.stringify({
+                    title, // Include title in the request body
                     description,
                     dueDate,
                     date: currentDate,
@@ -64,7 +65,6 @@ const Notestate = (props) => {
         } catch (error) {
             console.error(error.message);
         }
-
     };
 
     const editNote = async (id, updates) => {
