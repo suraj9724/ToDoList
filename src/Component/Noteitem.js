@@ -1,15 +1,16 @@
 import React, { useContext, useState } from 'react';
 import noteContext from '../context/notecontext';
-import EditNoteModal from './EditNoteModal';
-import DeleteConfirmModal from './DeleteConfirmModal';
 import ShowTaskModal from './ShowTaskModal';
 import './Noteitem.css';
 
 const Noteitem = (props) => {
     const context = useContext(noteContext);
+
     const { toggleComplete, deleteNote } = context;
     const { note, updateNote, onDelete } = props;
+    // eslint-disable-next-line
     const [showEditModal, setShowEditModal] = useState(false);
+    // eslint-disable-next-line
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showShowTaskModal, setShowShowTaskModal] = useState(false);
 

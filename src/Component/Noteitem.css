@@ -9,6 +9,14 @@
     padding: 16px;
 }
 
+.card-body .icon-btn {
+    display: none;
+}
+
+.card-body:hover .icon-btn {
+    display: inline-block;
+}
+
 .form-check-input {
     background-color: white;
     /* Primary Color */

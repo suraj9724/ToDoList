@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './ShowTaskModal.css';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import EditNoteModal from './EditNoteModal';
+import noteContext from '../context/notecontext';
 
-const ShowTaskModal = ({ note, onEdit, onDelete, onClose }) => {
+const ShowTaskModal = ({ note, onDelete, onClose }) => {
+    const { editNote } = useContext(noteContext); // Get editNote from context
     const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
     const [isEditModalVisible, setEditModalVisible] = useState(false);
 
@@ -16,8 +18,8 @@ const ShowTaskModal = ({ note, onEdit, onDelete, onClose }) => {
         setDeleteModalVisible(false);
     };
 
-    const handleEditSave = (editedNote) => {
-        onEdit(editedNote);
+    const handleEditSave = async (editedNote) => {
+        await editNote(note._id, editedNote); // Ensure _id is included
         setEditModalVisible(false);
     };
 
@@ -25,7 +27,7 @@ const ShowTaskModal = ({ note, onEdit, onDelete, onClose }) => {
         <div className="modal">
             <div className="modal-content">
                 <span className="close" onClick={onClose}>&times;</span>
-                <h4>{note.title}</h4>
+                <h4>{note.title}</h4> {/* Display the note title */}
                 <p>{note.description}</p>
                 <p>Due Date: {new Date(note.dueDate).toLocaleDateString()}</p>
                 <div className="modal-actions">

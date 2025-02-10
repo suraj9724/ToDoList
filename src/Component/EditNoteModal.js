@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './EditNoteModal.css';
 
 const EditNoteModal = ({ note, onSave, onClose }) => {
+
     const [editedTitle, setEditedTitle] = useState(note.title);
     const [editedDescription, setEditedDescription] = useState(note.description);
 
