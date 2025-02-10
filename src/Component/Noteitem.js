@@ -31,12 +31,13 @@ const Noteitem = (props) => {
     return (
         <>
             <div
-                className="note-item p-2 border rounded bg-light"
+                className="note-item p-2 border rounded-black bg-light"
                 draggable={!note.isCompleted}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
+                style={{ border: '1px solid #ccc' }}
             >
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-center ">
                     <div className="form-check d-flex align-items-center w-100 gap-2">
                         <input
                             className="form-check-input"
@@ -44,6 +45,7 @@ const Noteitem = (props) => {
                             checked={note.isCompleted}
                             onChange={() => toggleComplete(note._id)}
                             id={`checkbox-${note._id}`}
+                            style={{ border: '1px solid black' }}
                         />
                         <label
                             className={`form-check-label mb-0 ${note.isCompleted ? 'text-decoration-line-through' : ''}`}

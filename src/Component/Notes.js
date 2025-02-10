@@ -10,12 +10,26 @@ const Notes = () => {
     const [showWeekends, setShowWeekends] = useState(true);
     const [dragError, setDragError] = useState('');
     const [deleteAlert, setDeleteAlert] = useState('');
+    const [dragging, setDragging] = useState(false);
+    const [isEdgeTransitioning, setIsEdgeTransitioning] = useState(false); // Lock mechanism
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
             getNotes();
         }
     }, [getNotes]);
+
+    useEffect(() => {
+        if (dragging) {
+            document.addEventListener('dragover', handleDragOverEdge);
+        } else {
+            document.removeEventListener('dragover', handleDragOverEdge);
+        }
+        return () => {
+            document.removeEventListener('dragover', handleDragOverEdge);
+        };
+        // eslint-disable-next-line 
+    }, [dragging]);
 
     const getStartOfWeek = (date) => {
         const start = new Date(date);
@@ -53,27 +67,70 @@ const Notes = () => {
     };
 
     const handleDrop = (e, day) => {
+        e.preventDefault();
+        e.target.classList.remove('drag-over');
         const currentDate = new Date();
         if (day < currentDate.setHours(0, 0, 0, 0)) {
             setDragError('You cannot drag tasks into the past.');
             setTimeout(() => setDragError(''), 2000);
             return;
         }
+        try {
 
-        e.preventDefault();
-        e.target.classList.remove('drag-over');
-        const noteData = JSON.parse(e.dataTransfer.getData('noteData'));
-        if (!noteData) {
-            setDragError('Invalid drag operation.');
-            setTimeout(() => setDragError(''), 2000);
-            return;
+            const noteData = JSON.parse(e.dataTransfer.getData('noteData'));
+            if (!noteData) {
+                setDragError('Invalid drag operation.');
+                setTimeout(() => setDragError(''), 2000);
+                return;
+            }
+            const updatedNote = { ...noteData, dueDate: day.toISOString() };
+            editNote(noteData._id, updatedNote);
+        } catch (error) {
+            console.error(error.message);
+
         }
-        const updatedNote = { ...noteData, dueDate: day.toISOString() };
-        editNote(noteData._id, updatedNote);
+    };
+
+    const debounce = (func, delay) => {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func(...args);
+            }, delay);
+        };
+    };
+
+    const handleDragOverEdge = debounce((e) => {
+        const edgeThreshold = 50; // Pixels from the edge
+        const { clientX } = e;
+        if (isEdgeTransitioning) {
+            return; // Prevent multiple triggers during transition
+        }
+        if (clientX <= edgeThreshold) {
+            // Left edge - go to previous week
+            setIsEdgeTransitioning(true);
+            handlePrevWeek();
+            setTimeout(() => setIsEdgeTransitioning(false), 500); // Lock for 500ms
+        } else if (window.innerWidth - clientX <= edgeThreshold) {
+            // Right edge - go to next week
+            setIsEdgeTransitioning(true);
+            handleNextWeek();
+            setTimeout(() => setIsEdgeTransitioning(false), 500); // Lock for 500ms
+        }
+    }, 200); // Debounced by 200ms
+
+    const handleDragStart = () => {
+        setDragging(true);
+    };
+
+    const handleDragEnd = () => {
+        setDragging(false);
+        setIsEdgeTransitioning(false); // Reset the lock when dragging ends
     };
 
     return (
-        <div className="container mt-4">
+        <div className="container mt-4" onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Header Section */}
             <div className="calendar-header d-flex justify-content-between align-items-center mb-3">
                 <div className="d-flex gap-2">
@@ -89,7 +146,7 @@ const Notes = () => {
                     {startOfWeek.toLocaleString('default', { month: 'long', year: 'numeric' })}
                 </h2>
 
-                <button className="btn btn-outline-secondary" onClick={toggleWeekends}>
+                <button className="btn btn-outline-primary" onClick={toggleWeekends}>
                     {showWeekends ? 'Hide Weekends' : 'Show Weekends'}
                 </button>
             </div>
@@ -107,7 +164,7 @@ const Notes = () => {
             )}
 
             {/* Calendar Grid */}
-            <div className="row">
+            <div className="calendar-grid">
                 {Array.from({ length: 7 }).map((_, index) => {
                     const day = new Date(startOfWeek);
                     day.setDate(day.getDate() + index);
@@ -124,33 +181,33 @@ const Notes = () => {
                     return (
                         <div
                             key={index}
-                            className="col-md-6 col-lg-4 mb-3"
+                            className="day-card"
                             onDragOver={(e) => handleDragOver(e, day)}
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, day)}
                         >
-                            <div className="p-3 border rounded bg-light">
-                                <h5 className="mb-1">
-                                    {day.toLocaleString('en-US', { weekday: 'short' })}
-                                </h5>
-                                <p className="mb-0">{day.getDate()}</p>
+                            <h5 className="mb-1">
+                                {day.toLocaleString('en-US', { weekday: 'short' })}
+                            </h5>
+                            <p className="mb-0">{day.getDate()}</p>
 
-                                {filteredNotes.length === 0 ? (
-                                    <p className="text-muted text-center">No tasks</p>
-                                ) : (
-                                    filteredNotes.map(note => (
-                                        <Noteitem
-                                            key={note._id}
-                                            note={note}
-                                            updateNote={(note) => editNote(note._id, {
+                            {filteredNotes.length === 0 ? (
+                                <p className="text-muted text-center">No tasks</p>
+                            ) : (
+                                filteredNotes.map(note => (
+                                    <Noteitem
+                                        key={note._id}
+                                        note={note}
+                                        updateNote={(note) =>
+                                            editNote(note._id, {
                                                 description: note.description,
                                                 dueDate: note.dueDate
-                                            })}
-                                            onDelete={(message) => setDeleteAlert(message)}
-                                        />
-                                    ))
-                                )}
-                            </div>
+                                            })
+                                        }
+                                        onDelete={(message) => setDeleteAlert(message)}
+                                    />
+                                ))
+                            )}
                         </div>
                     );
                 })}
