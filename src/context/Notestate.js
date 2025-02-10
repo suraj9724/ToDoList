@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import NoteContext from "./notecontext";
 
 const Notestate = (props) => {
@@ -10,7 +10,7 @@ const Notestate = (props) => {
         return notesArray.sort((a, b) => new Date(b.date) - new Date(a.date));
     };
 
-    const getNotes = async () => {
+    const getNotes = useCallback(async () => {
         setLoading(true);
         try {
             const response = await fetch(`${host}/api/note/fetchNotes`, {
@@ -30,7 +30,7 @@ const Notestate = (props) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [host]);
 
     const addNote = async (title, description, dueDate) => {
         setLoading(true);

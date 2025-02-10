@@ -1,14 +1,14 @@
-.navbar {
+/* .navbar {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
 
-/* Adjust main content padding */
+Adjust main content padding/
 .container-fluid {
     padding-top: 1rem;
 }
 
-/* Smooth transition for navbar buttons */
+Smooth transition for navbar buttons
 .navbar .btn {
     transition: all 0.2s ease;
 }
@@ -17,7 +17,7 @@
     transform: translateY(-1px);
 }
 
-/* Active link styling */
+Active link styling
 .navbar .nav-link.active {
     font-weight: 500;
     position: relative;
@@ -33,7 +33,7 @@
     background-color: #fff;
 }
 
-/* Responsive adjustments */
+Responsive adjustments
 @media (max-width: 768px) {
     .navbar-brand {
         font-size: 1.1rem;
@@ -43,4 +43,4 @@
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
     }
-}
+} */

@@ -15,7 +15,7 @@ const Notes = () => {
         if (localStorage.getItem('token')) {
             getNotes();
         }
-    }, []);
+    }, [getNotes]);
 
     const getStartOfWeek = (date) => {
         const start = new Date(date);
@@ -43,113 +43,75 @@ const Notes = () => {
         setShowWeekends(!showWeekends);
     };
 
-    const handleDragOver = (e, targetDate) => {
+    const handleDragOver = (e, day) => {
         e.preventDefault();
-        const column = e.currentTarget;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (targetDate < today) {
-            column.classList.add('drag-over-invalid');
-            setDragError('Cannot move tasks to past dates');
-            return;
-        }
-        column.classList.add('drag-over');
-        setDragError('');
+        e.target.classList.add('drag-over');
     };
 
     const handleDragLeave = (e) => {
-        e.currentTarget.classList.remove('drag-over');
-        e.currentTarget.classList.remove('drag-over-invalid');
-        setDragError('');
+        e.target.classList.remove('drag-over');
     };
 
-    const handleDrop = async (e, targetDate) => {
-        e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
-        e.currentTarget.classList.remove('drag-over-invalid');
-
-        try {
-            const noteId = e.dataTransfer.getData('noteId');
-            const noteData = JSON.parse(e.dataTransfer.getData('noteData'));
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (targetDate < today) {
-                setDragError('Cannot move tasks to past dates');
-                return;
-            }
-
-            if (noteData.isCompleted) {
-                setDragError('Cannot move completed tasks');
-                return;
-            }
-
-            const formattedDate = targetDate.toISOString().split('T')[0];
-
-            // First delete the note from its current position
-            await context.deleteNote(noteId);
-
-            // Then create a new note at the target date
-            await context.addNote(noteData.title, noteData.description, formattedDate); // Ensure title is included
-            // Refresh notes to show the updated state
-            await getNotes();
-
-            setDragError('');
-
-        } catch (error) {
-            console.error('Error in handleDrop:', error);
-            setDragError('Error moving task. Please try again.');
-            await getNotes();
+    const handleDrop = (e, day) => {
+        const currentDate = new Date();
+        if (day < currentDate.setHours(0, 0, 0, 0)) {
+            setDragError('You cannot drag tasks into the past.');
+            setTimeout(() => setDragError(''), 2000);
+            return;
         }
-    };
 
-    const handleDelete = (message) => {
-        setDeleteAlert(message);
-        setTimeout(() => {
-            setDeleteAlert('');
-        }, 3000);
+        e.preventDefault();
+        e.target.classList.remove('drag-over');
+        const noteData = JSON.parse(e.dataTransfer.getData('noteData'));
+        if (!noteData) {
+            setDragError('Invalid drag operation.');
+            setTimeout(() => setDragError(''), 2000);
+            return;
+        }
+        const updatedNote = { ...noteData, dueDate: day.toISOString() };
+        editNote(noteData._id, updatedNote);
     };
 
     return (
-        <div className="calendar-container">
-            <div className="calendar-header">
-                <div className="nav-buttons">
-                    <button className="nav-button" onClick={handlePrevWeek}>
-                        Previous Week
+        <div className="container mt-4">
+            {/* Header Section */}
+            <div className="calendar-header d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex gap-2">
+                    <button className="btn btn-outline-primary" onClick={handlePrevWeek}>
+                        &lt;
                     </button>
-                    <button className="nav-button" onClick={handleNextWeek}>
-                        Next Week
+                    <button className="btn btn-outline-primary" onClick={handleNextWeek}>
+                        &gt;
                     </button>
                 </div>
-                <h2>{startOfWeek.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
-                <button className="nav-button" onClick={toggleWeekends}>
+
+                <h2 className="text-center">
+                    {startOfWeek.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                </h2>
+
+                <button className="btn btn-outline-secondary" onClick={toggleWeekends}>
                     {showWeekends ? 'Hide Weekends' : 'Show Weekends'}
                 </button>
             </div>
 
+            {/* Alert Messages */}
             {dragError && (
-                <div className="alert alert-warning mb-3" role="alert">
+                <div className="alert alert-warning" role="alert">
                     {dragError}
                 </div>
             )}
-
             {deleteAlert && (
-                <div className="alert alert-danger mb-3" role="alert">
+                <div className="alert alert-danger" role="alert">
                     {deleteAlert}
                 </div>
             )}
 
-            <div
-                className="calendar-grid"
-                style={{
-                    gridTemplateColumns: `repeat(${showWeekends ? 7 : 5}, 1fr)`
-                }}
-            >
+            {/* Calendar Grid */}
+            <div className="row">
                 {Array.from({ length: 7 }).map((_, index) => {
                     const day = new Date(startOfWeek);
                     day.setDate(day.getDate() + index);
+
                     const filteredNotes = notes.filter(note => {
                         const noteDate = new Date(note.dueDate);
                         return noteDate.toDateString() === day.toDateString();
@@ -162,32 +124,33 @@ const Notes = () => {
                     return (
                         <div
                             key={index}
-                            className="day-column"
+                            className="col-md-6 col-lg-4 mb-3"
                             onDragOver={(e) => handleDragOver(e, day)}
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, day)}
                         >
-                            <div className="day-header">
+                            <div className="p-3 border rounded bg-light">
                                 <h5 className="mb-1">
                                     {day.toLocaleString('en-US', { weekday: 'short' })}
                                 </h5>
                                 <p className="mb-0">{day.getDate()}</p>
+
+                                {filteredNotes.length === 0 ? (
+                                    <p className="text-muted text-center">No tasks</p>
+                                ) : (
+                                    filteredNotes.map(note => (
+                                        <Noteitem
+                                            key={note._id}
+                                            note={note}
+                                            updateNote={(note) => editNote(note._id, {
+                                                description: note.description,
+                                                dueDate: note.dueDate
+                                            })}
+                                            onDelete={(message) => setDeleteAlert(message)}
+                                        />
+                                    ))
+                                )}
                             </div>
-                            {filteredNotes.length === 0 ? (
-                                <p className="empty-day">No tasks</p>
-                            ) : (
-                                filteredNotes.map(note => (
-                                    <Noteitem
-                                        key={note._id}
-                                        note={note}
-                                        updateNote={(note) => editNote(note._id, {
-                                            description: note.description,
-                                            dueDate: note.dueDate
-                                        })}
-                                        onDelete={handleDelete}
-                                    />
-                                ))
-                            )}
                         </div>
                     );
                 })}

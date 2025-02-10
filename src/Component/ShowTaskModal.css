@@ -1,3 +1,4 @@
+/* Modal overlay */
 .modal {
     display: flex;
     justify-content: center;
@@ -9,24 +10,115 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    padding: var(--spacing-unit);
 }
 
+/* Modal content container */
 .modal-content {
     background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 400px;
+    border-radius: 12px;
+    width: min(90%, 500px);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: clamp(16px, 4vw, 24px);
 }
 
-.close {
-    cursor: pointer;
-    float: right;
-    font-size: 20px;
-}
-
-.modal-actions {
+/* Modal header */
+.modal-header {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    align-items: center;
+    margin-bottom: clamp(12px, 3vw, 20px);
+    padding-bottom: clamp(8px, 2vw, 12px);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-header h3 {
+    font-size: var(--font-size-lg);
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Close button */
+.close {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    color: #6c757d;
+}
+
+.close:hover {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+/* Modal content area */
+.modal-body {
+    margin-bottom: clamp(16px, 4vw, 24px);
+    font-size: var(--font-size-base);
+}
+
+/* Action buttons container */
+.modal-actions {
+    display: flex;
+    gap: clamp(8px, 2vw, 12px);
+    margin-top: clamp(16px, 4vw, 24px);
+}
+
+/* Touch-friendly buttons */
+.modal-actions button {
+    min-height: 44px;
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
+    border-radius: 8px;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    .modal {
+        padding: 16px;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-height: 85vh;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .modal-actions button {
+        width: 100%;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 481px) and (max-width: 768px) {
+    .modal-content {
+        width: 85%;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .close {
+        padding: 12px;
+    }
+
+    .modal-actions button {
+        padding: 12px 16px;
+    }
 }

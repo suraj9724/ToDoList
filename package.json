@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "concurrently": "^9.1.2",
     "cra-template": "1.2.0",
     "git": "^0.1.5",

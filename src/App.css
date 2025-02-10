@@ -10,3 +10,105 @@
   z-index: 1000;
   /* Ensure it is above other content */
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Global responsive styles */
+:root {
+  --spacing-unit: clamp(0.5rem, 2vw, 1rem);
+  --font-size-sm: clamp(0.875rem, 1vw, 1rem);
+  --font-size-base: clamp(1rem, 1.2vw, 1.125rem);
+  --font-size-lg: clamp(1.25rem, 2vw, 1.5rem);
+  --font-size-xl: clamp(1.5rem, 2.5vw, 2rem);
+}
+
+/* Base responsive styles */
+html {
+  font-size: 16px;
+}
+
+body {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+/* Container responsive padding */
+.container {
+  padding-left: var(--spacing-unit);
+  padding-right: var(--spacing-unit);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Touch-friendly buttons */
+button,
+.btn,
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.5rem 1rem;
+  touch-action: manipulation;
+}
+
+/* Form elements */
+input,
+select,
+textarea {
+  font-size: var(--font-size-base);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  width: 100%;
+}
+
+/* Responsive typography */
+h1 {
+  font-size: var(--font-size-xl);
+}
+
+h2 {
+  font-size: var(--font-size-lg);
+}
+
+h3 {
+  font-size: var(--font-size-base);
+}
+
+p {
+  font-size: var(--font-size-base);
+}
+
+/* Responsive grid system */
+.grid {
+  display: grid;
+  gap: var(--spacing-unit);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  .mobile-full-width {
+    width: 100%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hide-tablet {
+    display: none;
+  }
+}
+
+@media (min-width: 1025px) {
+  .hide-desktop {
+    display: none;
+  }
+}
