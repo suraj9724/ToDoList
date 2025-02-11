@@ -98,7 +98,7 @@ const AddNote = ({ onClose }) => {
                                     <button
                                         type="submit"
                                         className="btn btn-primary px-4"
-                                        disabled={note.description.length < 5}
+                                        disabled={note.dueDate === ""}
                                     >
                                         Add Note
                                     </button>

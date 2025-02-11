@@ -52,7 +52,7 @@ const Navbar = () => {
       <div style={{ height: '56px' }}></div>
 
       {/* Background Overlay */}
-      {showAddNoteModal && <div className="modal-overlay" onClick={() => setShowAddNoteModal(false)}></div>}
+      {/* {showAddNoteModal && <div className="modal-overlay" onClick={() => setShowAddNoteModal(false)}></div>} */}
 
       {/* AddNote Modal */}
       {showAddNoteModal && (
