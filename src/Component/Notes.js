@@ -130,89 +130,75 @@ const Notes = () => {
     };
 
     return (
-        <div className="container mt-4" onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {/* Header Section */}
-            <div className="calendar-header d-flex justify-content-between align-items-center mb-3">
-                <div className="d-flex gap-2">
-                    <button className="btn btn-outline-primary" onClick={handlePrevWeek}>
-                        &lt;
+        <>
+            <div className="calendar-container" onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+                {/* Header Section */}
+                <div className="calendar-header">
+                    <div className="d-flex gap-2">
+                        <button className="nav-button" onClick={handlePrevWeek}>&lt;</button>
+                        <button className="nav-button" onClick={handleNextWeek}>&gt;</button>
+                    </div>
+                    <h2>{startOfWeek.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
+                    <button className="nav-button" onClick={toggleWeekends}>
+                        {showWeekends ? 'Hide Weekends' : 'Show Weekends'}
                     </button>
-                    <button className="btn btn-outline-primary" onClick={handleNextWeek}>
-                        &gt;
-                    </button>
                 </div>
 
-                <h2 className="text-center">
-                    {startOfWeek.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                </h2>
+                {/* Alert Messages */}
+                {dragError && <div className="alert alert-warning" role="alert">{dragError}</div>}
+                {deleteAlert && <div className="alert alert-danger" role="alert">{deleteAlert}</div>}
 
-                <button className="btn btn-outline-primary" onClick={toggleWeekends}>
-                    {showWeekends ? 'Hide Weekends' : 'Show Weekends'}
-                </button>
+                {/* Calendar Grid */}
+                <div className="calendar-grid">
+                    {Array.from({ length: 7 }).map((_, index) => {
+                        const day = new Date(startOfWeek);
+                        day.setDate(day.getDate() + index);
+
+                        const filteredNotes = notes.filter(note => {
+                            const noteDate = new Date(note.dueDate);
+                            return noteDate.toDateString() === day.toDateString();
+                        });
+
+                        if (!showWeekends && (day.getDay() === 0 || day.getDay() === 6)) {
+                            return null;
+                        }
+
+                        return (
+                            <div
+                                key={index}
+                                className="day-card"
+                                onDragOver={(e) => handleDragOver(e, day)}
+                                onDragLeave={handleDragLeave}
+                                onDrop={(e) => handleDrop(e, day)}
+                            >
+                                <div className="p-3 border rounded bg-light">
+                                    <h5 className="mb-1">{day.toLocaleString('en-US', { weekday: 'short' })}</h5>
+                                    <p className="mb-0">{day.getDate()}</p>
+
+                                    {filteredNotes.length === 0 ? (
+                                        <p className="text-muted text-center flex-grow">No tasks</p>
+                                    ) : (
+                                        <div className={`tasks-container ${filteredNotes.length >= 4 ? 'scrollable' : ''}`}>
+                                            {filteredNotes.map(note => (
+                                                <Noteitem
+                                                    key={note._id}
+                                                    note={note}
+                                                    updateNote={(note) => editNote(note._id, {
+                                                        description: note.description,
+                                                        dueDate: note.dueDate
+                                                    })}
+                                                    onDelete={(message) => setDeleteAlert(message)}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-
-            {/* Alert Messages */}
-            {dragError && (
-                <div className="alert alert-warning" role="alert">
-                    {dragError}
-                </div>
-            )}
-            {deleteAlert && (
-                <div className="alert alert-danger" role="alert">
-                    {deleteAlert}
-                </div>
-            )}
-
-            {/* Calendar Grid */}
-            <div className="calendar-grid">
-                {Array.from({ length: 7 }).map((_, index) => {
-                    const day = new Date(startOfWeek);
-                    day.setDate(day.getDate() + index);
-
-                    const filteredNotes = notes.filter(note => {
-                        const noteDate = new Date(note.dueDate);
-                        return noteDate.toDateString() === day.toDateString();
-                    });
-
-                    if (!showWeekends && (day.getDay() === 0 || day.getDay() === 6)) {
-                        return null;
-                    }
-
-                    return (
-                        <div
-                            key={index}
-                            className="day-card"
-                            onDragOver={(e) => handleDragOver(e, day)}
-                            onDragLeave={handleDragLeave}
-                            onDrop={(e) => handleDrop(e, day)}
-                        >
-                            <h5 className="mb-1">
-                                {day.toLocaleString('en-US', { weekday: 'short' })}
-                            </h5>
-                            <p className="mb-0">{day.getDate()}</p>
-
-                            {filteredNotes.length === 0 ? (
-                                <p className="text-muted text-center">No tasks</p>
-                            ) : (
-                                filteredNotes.map(note => (
-                                    <Noteitem
-                                        key={note._id}
-                                        note={note}
-                                        updateNote={(note) =>
-                                            editNote(note._id, {
-                                                description: note.description,
-                                                dueDate: note.dueDate
-                                            })
-                                        }
-                                        onDelete={(message) => setDeleteAlert(message)}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
+        </>
     );
 };
 

@@ -1,0 +1,21 @@
+.note-item {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    position: relative;
+    min-height: 60px; /* Ensures space for the eye icon */
+    max-width: 100%; /* Ensure the card doesn't overflow its container */
+    width: fit-content; /* Adjust width to fit content */
+}
+
+.form-check-label {
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    flex-grow: 1;
+    max-width: calc(100% - 40px); /* Adjust the width to leave space for the icon */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Show ellipsis for overflow */
+}

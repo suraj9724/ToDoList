@@ -51,7 +51,9 @@ const Noteitem = (props) => {
                             className={`form-check-label mb-0 ${note.isCompleted ? 'text-decoration-line-through' : ''}`}
                             htmlFor={`checkbox-${note._id}`}
                         >
-                            <strong>{note.title}</strong>
+                            <strong>
+                                {note.title.length > 5 ? `${note.title.slice(0, 5)}...` : note.title}
+                            </strong>
                         </label>
                     </div>
                     <button
