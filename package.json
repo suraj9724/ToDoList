@@ -9,10 +9,7 @@
     "git": "^0.1.5",
     "mongoose": "^8.9.5",
     "react": "^19.0.0",
-    "react-bootstrap": "^2.10.9",
-    "react-calendar": "^5.1.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1"
   },
   "scripts": {
@@ -40,9 +37,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
-    "@types/react-beautiful-dnd": "^13.1.8"
   }
 }
